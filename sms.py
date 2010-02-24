@@ -16,21 +16,23 @@ def main():
 		line = line.upper()
 		line = line.replace('2',' TO ')
 		line = line.replace('4',' FOR ')
-		line = line.replace(':)','  SMILEY ')
-		line = line.replace(':(','  SMILEY ')
-		line = line.replace(':P','  SMILEY ')
-		line = line.replace(':-)',' SMILEY ')
-		line = line.replace(':-(',' SMILEY ')
-		line = line.replace(';o)',' SMILEY ')
-		line = line.replace('=)','  SMILEY ')
-		line = line.replace('=(','  SMILEY ')
-		line = line.replace('.......',' DOTS ')
-		line = line.replace('......',' DOTS ')
-		line = line.replace('.....',' DOTS ')
-		line = line.replace('....',' DOTS ')
-		line = line.replace('...',' DOTS ')
-		line = line.replace('..',' DOTS ')
+		
+		
+		# match les sries de points (>1 point)
+		reDots = '\.\.+'
+		reDots = re.compile(reDots)
+		line = reDots.sub(' DOTS ',line,count=0)
+		
 		line = line.replace('.',' DOT ')
+		
+		reSmiley = '([;:][-o]?)|=[\(\)pP]'
+		reSmiley = re.compile(reSmiley)
+		line = reSmiley.sub(' SMILEY ',line,count=0)
+		
+		
+		
+		
+		
 		line = line.replace('?',' INTERROGATIONDOT ')
 		line = line.replace('!',' EXCLAMATIONDOT ')
 		line = line.replace('<TEXT>','')
@@ -61,6 +63,9 @@ def main():
 	
 	lexicon_list.sort(comp)
 	
+	print lexicon_list
+
+	
 	#ngramcon
 	for line in tokenlines:
 		for i in range(len(line)-2):
@@ -89,6 +94,7 @@ def main():
 	#print threegramcon_list
 	threefreq = [ x[1] for x in threegramcon_list]
 	twofreq = [ x[1] for x in twogramcon_list]
+	unifreq = [ x[1] for x in lexicon_list]
 
 	def histogram(list):
 		hist = {}
@@ -106,12 +112,8 @@ def main():
 	#print 'yo'
 
 	
-	for x in histogram(threefreq):
+	for x in histogram(unifreq):
 		print x
-
-
-	
-
 
 	
 	#print lexicon_list 
