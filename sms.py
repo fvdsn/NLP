@@ -21,7 +21,10 @@ def main():
 		# match les sries de points (>1 point)
 		reDots = '\.\.+'
 		reDots = re.compile(reDots)
-		line = reDots.sub(' DOTS ',line,count=0)
+		line = reDots.sub(' <dots> ',line,count=0)
+		
+		reDot = r"\.|!|\?"
+		reDot = re.compile
 		
 		line = line.replace('.',' DOT ')
 		
@@ -30,11 +33,12 @@ def main():
 		line = reSmiley.sub(' SMILEY ',line,count=0)
 		
 		
-		
+		#TODO rassembler les différents points.
 		
 		
 		line = line.replace('?',' INTERROGATIONDOT ')
 		line = line.replace('!',' EXCLAMATIONDOT ')
+		
 		line = line.replace('<TEXT>','')
 		line = line.replace('</TEXT>','')
 		#tokens = re.split(r"\W+|[.,!?;]",line)
