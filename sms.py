@@ -2,33 +2,6 @@
 import sys
 import re
 
-
-def count(lexicons,ngram):
-	"""renvoie le nombre de fois que le ngram apparait dans le texte
-	   lexicons est un dico associant le degré n au lexicon des ngrammes de degré n"""
-	n = len(ngram)
-	if n in lexicons.keys():
-		if ngram in lexicons[n]:
-			return float(lexicons[n][ngram])
-	return 0.0
-
-def maximium_likelihood(lexicons, ngram, prefix):
-	"""renvoie la probabilité P(w|h) avec ngram = h,w et prefix = h, lexicons: voir count"""
-	if count(prefix) > 0:
-		return count(lexicons,ngram)/count(lexicons,prefix)
-	else:
-		return 0.0
-
-def laplace(lexicons,ngram,prefix):
-	"""renvoie la probabilité P(w|h), avec laplace smoothing avec ngram = h,w et prefix = h, lexicons: voir count"""
-	wlen = len(ngram)-len(prefix)			# vaut normalement 1
-	w = ngram[len(ngram)-wlen:len(ngram)]	# prendre les wlen dernier tokens de ngram
-	Wcount = 0								# |W|
-	if wlen in lexicons.keys():
-		Wcount = len(lexicons[wlen].keys())
-	
-	return ( count(lexicons,ngram) + 1.0 ) / ( count(lexicons,prefix) + Wcount )
-
 def main():
 	if len(sys.argv) < 2:
 		exit()
@@ -166,7 +139,7 @@ def main():
 		reSplit = re.compile(reSplit)
 		tokens = reSplit.findall(line)
 		tokenline = []
-		print tokens
+		#print tokens
 		for token in tokens:
 			if token == '':
 				continue
@@ -190,53 +163,71 @@ def main():
 	print lexicon_list
 
 	
-	
 	# Compute a dictionary of N-grams
-	#def ngramCount(tokenlines,order) :
-	#	for line in tokenlines : 
-	#		for i in range(len(line)-
-	
-	#ngramcon
-	for line in tokenlines:
-		for i in range(len(line)-2):
-			key = tuple(line[i:i+3])
-			if key in threegramcon:
-				threegramcon[key] +=1
-			else:
-				threegramcon[key] = 1
-		for i in range(len(line)-1):
-			key = tuple(line[i:i+2])
-			if key in twogramcon:
-				twogramcon[key] +=1
-			else:
-				twogramcon[key] = 1
-	
-	threegramcon_list = []
-	for lex in threegramcon.keys():
-		threegramcon_list.append( (lex, threegramcon[lex]) )
-	threegramcon_list.sort(comp)
-
-	twogramcon_list = []
-	for lex in twogramcon.keys():
-		twogramcon_list.append( (lex, twogramcon[lex]) )
-	twogramcon_list.sort(comp)
-
-	#print threegramcon_list
-	threefreq = [ x[1] for x in threegramcon_list]
-	twofreq = [ x[1] for x in twogramcon_list]
-	unifreq = [ x[1] for x in lexicon_list]
-
-	def histogram(list):
-		hist = {}
-		for x in list:
-			if x in hist:
-				hist[x] += 1
-			else:
-				hist[x] = 1
-		list = hist.values()
-		list.sort()
-		list.reverse()
-		return list
+	def ngramCount(tokenlines,order) :
+		start = ('<text_start>',)
+		count = {}
+		for line in tokenlines:
+			
+			if order > 2 : 
+				for i in range(2,order):
+					key = start*(order-i) + tuple(line[0:i])
+					if key in count:
+						count[key] += 1
+					else :
+						count[key]=1
+						
+				
+			for i in range(len(line)-order+2):
+				key = tuple(line[i:i+order])
+				if key in count:
+					count[key] += 1
+				else :
+					count[key] = 1
+		
+		return count
+							
+#	#ngramcon
+#	for line in tokenlines:
+#		for i in range(len(line)-2):
+#			key = tuple(line[i:i+3])
+#			if key in threegramcon:
+#				threegramcon[key] +=1
+#			else:
+#				threegramcon[key] = 1
+#		for i in range(len(line)-1):
+#			key = tuple(line[i:i+2])
+#			if key in twogramcon:
+#				twogramcon[key] +=1
+#			else:
+#				twogramcon[key] = 1
+#	
+#	threegramcon_list = []
+#	for lex in threegramcon.keys():
+#		threegramcon_list.append( (lex, threegramcon[lex]) )
+#	threegramcon_list.sort(comp)
+#
+#	twogramcon_list = []
+#	for lex in twogramcon.keys():
+#		twogramcon_list.append( (lex, twogramcon[lex]) )
+#	twogramcon_list.sort(comp)
+#
+#	#print threegramcon_list
+#	threefreq = [ x[1] for x in threegramcon_list]
+#	twofreq = [ x[1] for x in twogramcon_list]
+#	unifreq = [ x[1] for x in lexicon_list]
+#
+#	def histogram(list):
+#		hist = {}
+#		for x in list:
+#			if x in hist:
+#				hist[x] += 1
+#			else:
+#				hist[x] = 1
+#		list = hist.values()
+#		list.sort()
+#		list.reverse()
+#		return list
 
 	#print threefreq
 	#print 'yo'
