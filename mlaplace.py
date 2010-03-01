@@ -23,13 +23,12 @@ class Model:
         self.lexicon = self.__ngramCount(training, 1)
         self.n = len(self.lexicon)
         
-        print self.lexicon
+        print(len(self.lexicon))
     
     def shannon_game(self,histo):
         propositions = []
-        for word in self.lexicon.keys() : 
-            if word != ():    
-                propositions.append((self.probNG(word[0],histo),word[0]))
+        for word in self.lexicon.keys() :   
+            propositions.append((self.probNG(word[0],histo),word[0]))
       
         propositions.sort(reverse=True)
         return propositions
@@ -48,7 +47,6 @@ class Model:
         return (cSentence+1)/(1.0 * cHisto + self.n) 
     
     def __ngramCount(self,tokenlines,order) :
-        print order
         start = ('<text_start>',)
         count = {}
         for line in tokenlines:
@@ -62,7 +60,7 @@ class Model:
                         count[key]=1
                     
                
-            for i in range(len(line)-order+2):
+            for i in range(len(line)-order+1):
                 key = tuple(line[i:i+order])
                 if key in count:
                     count[key] += 1

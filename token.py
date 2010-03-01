@@ -62,6 +62,20 @@ def tokenizer(filename):
     
     # Compute a dictionary of N-grams
 
+def preprocessTraining(tokenlines,lexicon):
+    filteredTokens = []
+    
+    for tokenline in tokenlines :
+        filteredLine = []
+        for token in tokenline :
+            if (token,) in lexicon.keys():
+                filteredLine.append(token)
+            else : filteredLine.append('<unk>')
+        
+        filteredTokens.append(filteredLine)
+    
+    return filteredTokens
+
 def preprocess(line):
     line = line.upper()
         
@@ -260,7 +274,23 @@ def preprocess(line):
     reSmiley = re.compile(reSmiley)
     line = reSmiley.sub(' <smiley> ',line,count=0)
         
-    return line  
+    return line
+
+def tokensFilter(tokenlines):
+    
+    lexicons = sms2.ngramCount(tokenlines, 1)
+    filteredLines = []
+    
+    for line in tokenlines:
+        tokenline = []
+        for token in line:
+            if lexicons[(token,)]<3:
+                print "replacement"
+                tokenline.append('<unk>')
+            else : tokenline.append(token)
+        filteredLines.append(tokenline)
+    
+    return filteredLines
 
 def main():
     
