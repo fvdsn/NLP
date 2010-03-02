@@ -33,7 +33,7 @@ class Model:
 			elif(n+1 == order):
 				self.lexicon_set[n+1] = self.ngCount
 			elif(n+1 == 1):
-				self.lexicon_set[n+1] = self.lexicon
+				self.lexicon_set[1] = self.lexicon
 			else:
 				self.lexicon_set[n+1] = self.__ngramCount(training,n+1)
 
@@ -50,10 +50,6 @@ class Model:
 		
 
 	def probNG_KN(self,word,histo):
-		order = len(histo) + 1
-		hw    = histo + (word,)
-		if hw in self.probNG_KN_cache:
-			return self.probNG_KN_cache[hw]
 
 		def dc(order):
 			n1 = 0
@@ -67,34 +63,39 @@ class Model:
 				elif n == 2:
 					n2 += 2
 			dc = n1 / float(n1 + 2*n2)
+			print "DC(",order,"):",dc
 			self.probNG_KN_dc_cache[order] = dc
 			return dc
 
 		def pback(self,word,histo):
-			histo = histo[1:len(histo)]
-			if histo == ():
-				if word in self.lexicon_set[1]:
-					# TODO how could word not be in self.lexicon_set[1] ????
-					return self.lexicon_set[1][word] / float(ntot)
-				else:
-					return 0
+			hist_1 = histo[1:len(histo)]
+			if hist_1 == ():
+				return self.lexicon_set[1][(word,)] / float(self.ntot)
 			else:
-				return self.probNG_KN(word,histo)
+				return self.probNG_KN(word,hist_1)
 
 		def gamma(self,histo):
 			if histo in self.probNG_KN_gamma_cache:
 				return self.probNG_KN_gamma_cache[histo]
 			g = 0.0
 			for w in self.lexicon_set[1].keys():
-				if hw in self.lexicon_set[order]:
-					g = g + dc(order)/float(self.lexicon_set[order][hw])
+				hw = histo + w
+				#print hw
+				if hw in self.lexicon_set[len(hw)]:
+					g = g + dc(len(hw))/float(self.lexicon_set[len(histo)][histo])
 			self.probNG_KN_gamma_cache[histo] = g
 			return g
 
 		prob = 0
+		hw    = histo + (word,)
+		order = len(hw)
+
+		if hw in self.probNG_KN_cache:
+			return self.probNG_KN_cache[hw]
+
 		if hw in self.lexicon_set[order]: #self.lexicon_set[order][hw] > 0:
 			prob = ((self.lexicon_set[order][hw] - dc(order))/float(self.lexicon_set[order-1][histo])) +	gamma(self,histo) * pback(self,word,histo)
-		elif self.lexicon_set[order-1][histo] > 0:
+		elif histo in self.lexicon_set[len(histo)]:
 			prob = gamma(self,histo)  * pback(self,word,histo)
 		else:
 			prob = pback(self,word,histo)
