@@ -96,7 +96,7 @@ def main():
 	#testfile = open("../smstest.txt")
 	
 	traintokenlines = token.smartTokenizer(trainfile)
-	print traintokenlines
+	#print traintokenlines
 	
 	#mod = mlaplace.Model(traintokenlines,3)
 	mod = mkn.Model(traintokenlines,3)
