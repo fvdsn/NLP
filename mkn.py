@@ -5,6 +5,7 @@ Created on 26 fevr. 2010
 '''
 
 import math
+import random
 
 class Model:
 	'''
@@ -17,27 +18,24 @@ class Model:
 		'''
 		self.order = order
 		self.training = training
-		self.histoCount = self.__ngramCount(training,order-1)	#ngram -1
-		self.ngCount = self.__ngramCount(training, order)		#ngram
-		self.lexicon = self.__ngramCount(training, 1)			#lexicon
-		self.n = len(self.lexicon)
-		self.ntot = sum(self.lexicon.values())
 		self.lexicon_set = {}
+
 		self.probNG_KN_cache = {}			#memoization of probNG_KN(...) 
 		self.probNG_KN_gamma_cache = {}			#memoization of probNG_KN(...) 
 		self.probNG_KN_dc_cache = {}			#memoization of probNG_KN(...) 
 		
+		print "\tComputing lexicons..."
 		for n in range(order):
-			if(n+1 == order-1):
-				self.lexicon_set[n+1] = self.histoCount
-			elif(n+1 == order):
-				self.lexicon_set[n+1] = self.ngCount
-			elif(n+1 == 1):
-				self.lexicon_set[1] = self.lexicon
-			else:
-				self.lexicon_set[n+1] = self.__ngramCount(training,n+1)
+			print "\t\tOrder :",n+1,"..."
+			self.lexicon_set[n+1] = self.__ngramCount(training,n+1)
+		print "\tDone"
 
-		print "computing lexicons... done"
+		self.histoCount = self.lexicon_set[order-1]	
+		self.ngCount = self.lexicon_set[order]		
+		self.lexicon = self.lexicon_set[1]			
+		self.n = len(self.lexicon)
+		self.ntot = sum(self.lexicon.values())
+
 
 	def shannon_game(self,histo):
 		propositions = []
@@ -47,7 +45,17 @@ class Model:
 	  
 		propositions.sort(reverse=True)
 		return propositions
-		
+	
+	def check_proba(self,order,percentage):
+		rounds = len(self.lexicon_set[order-1].keys())*percentage
+		for r in range(rounds):
+			histo = random.choice(self.lexicon_set[order-1].keys())
+			print histo
+			proba = 0.0
+			for word in self.lexicon.keys():
+				if word != () :
+					proba += self.probNG_KN(word[0],histo)
+			print proba
 
 	def probNG_KN(self,word,histo):
 
@@ -70,7 +78,11 @@ class Model:
 		def pback(self,word,histo):
 			hist_1 = histo[1:len(histo)]
 			if hist_1 == ():
-				return self.lexicon_set[1][(word,)] / float(self.ntot)
+				if (word,) in self.lexicon_set[1]:
+					return self.lexicon_set[1][(word,)] / float(self.ntot)
+				else:
+					#return 0.0
+					return self.lexicon_set[1][('<unk>',)] / float(self.ntot)
 			else:
 				return self.probNG_KN(word,hist_1)
 
@@ -94,7 +106,15 @@ class Model:
 			return self.probNG_KN_cache[hw]
 
 		if hw in self.lexicon_set[order]: #self.lexicon_set[order][hw] > 0:
-			prob = ((self.lexicon_set[order][hw] - dc(order))/float(self.lexicon_set[order-1][histo])) +	gamma(self,histo) * pback(self,word,histo)
+			try:
+				prob = ((self.lexicon_set[order][hw] - dc(order))/float(self.lexicon_set[len(histo)][histo])) +	gamma(self,histo) * pback(self,word,histo)
+			except KeyError:
+				print KeyError
+				print "hw",hw
+				print "histo",histo
+				print histo in self.lexicon_set[len(histo)]
+				exit()
+
 		elif histo in self.lexicon_set[len(histo)]:
 			prob = gamma(self,histo)  * pback(self,word,histo)
 		else:
@@ -105,13 +125,12 @@ class Model:
 		return prob
 
 	def __ngramCount(self,tokenlines,order) :
-		print order
 		start = ('<text_start>',)
 		count = {}
 		for line in tokenlines:
 		
-			if order > 2 : 
-				for i in range(2,order):
+			if order > 1 : 
+				for i in range(1,order):
 					key = start*(order-i) + tuple(line[0:i])
 					if key in count:
 						count[key] += 1
@@ -128,36 +147,42 @@ class Model:
 
 		return count    
 
-	def probText(self,testlines): 
-		logprob = 0
-		for line in testlines : 
-			logprob += self.probLine(line)
-		
-		return logprob 
 			
+	def probText(self,testlines):
+		''' 
+		Compute the log probability of a text (given as a list of lists of toke
+		ns) according to the laplacian model
+		'''
+		length = 0
+		logprob = 0
+		for line in testlines :
+			probinc, lengthinc = self.probLine(line) 
+			logprob += probinc
+			length  += lengthinc
+		
+		return logprob, length 	
 			
 	def probLine(self,line):
-		line =  ['<text_start>']*(self.order-2) + line
+		'''
+		Compute the log probability of line (a list of tokens=strings) according
+		to the laplacian model
+		'''
+		
+		line =  ['<text_start>']*(self.order-1) + line[1:]
 		logprob = 0
 		i = 0
 		for word in line[self.order-1:]:
 			histo = tuple(line[i:(i+self.order-1)])
-			#print "word "  + str(word)
-			#print "histo " + str(histo)
 			prob = self.probNG_KN(word,histo)
-			#print "p:"+str(prob)
-			if prob>0 : 
-				logprob += math.log(prob,2) 
+			logprob += math.log(prob,2) 
 			i+=1
-			
 		
-		return logprob
-			
-	def perplexity(self,testset):
-		
-		prob = self.probText(testset)
-		
-		return 2**(prob/self.n)
-     
-   
+		return logprob,i
 
+	def perplexity(self,testset):
+		'''
+		Compute the perplexity of a text according to the laplacian model.
+		'''
+		
+		prob,N = self.probText(testset)
+		return 2**(-prob/N)

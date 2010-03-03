@@ -92,6 +92,7 @@ class Model:
 	
 		return count	
 	
+			
 	def probText(self,testlines):
 		''' 
 		Compute the log probability of a text (given as a list of lists of toke
@@ -105,7 +106,7 @@ class Model:
 			length  += lengthinc
 		
 		return logprob, length 	
-			
+
 	def probLine(self,line):
 		'''
 		Compute the log probability of line (a list of tokens=strings) according

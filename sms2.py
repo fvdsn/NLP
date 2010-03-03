@@ -43,6 +43,7 @@ def ngramCount(tokenlines,order) :
 	start = ('<text_start>',)
 	count = {}
 	for line in tokenlines:
+		print line
 		
 		if order > 2 : 
 			for i in range(2,order):
@@ -93,16 +94,41 @@ def main():
 	
 	argsNb = len(sys.argv)
 	trainfile = open(sys.argv[argsNb-1])
-	#testfile = open("../smstest.txt")
+	testfile = open("smstest.txt")
 	
+	print "Tokenize..."
 	traintokenlines = token.smartTokenizer(trainfile)
+	print "Done"
+	#traintokenlines = token.preprocessTraining(traintokenlines,mod.lexicon)
 	#print traintokenlines
 	
 	#mod = mlaplace.Model(traintokenlines,3)
+	print "Token Counting ..."
 	mod = mkn.Model(traintokenlines,3)
+	print "Done"
+
+	print "Checking probabilities ..."
+	mod.check_proba(3,0.01)
+	print "Done"
 	
-	#print mod.perplexity(token.smartTokenizer(testfile))
-	print mod.shannon_game(("BOTH","OF"))
+	print "Perplexity ..."
+	print mod.perplexity(token.smartTokenizer(testfile))
+	print "Done"
+	#game =  mod.shannon_game(("BOTH","OF","MY"))
+	#i = 0
+	#print "-----------------------------------------"
+	#for g in game:
+	#	if g[1] == 'PARENTS':
+	#		print i
+	#	else:
+	#		i += 1
+	#print "-----------------------------------------"
+	#for g in game:
+	#	print g
+	#print "-----------------------------------------"
+
+
+	
 	
 	#print mod.probText(tokenizer(testfile))
 	#str = ["<text_start>","OKKO","<dotsi>","YESLO","<dot>","<text_end>"]

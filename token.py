@@ -82,8 +82,8 @@ def preprocess(line):
 	line = line.replace(',',' <comma> ')
 		
 	# les balises ne doivent contenir que du texte pour findall
-	line = line.replace('</TEXT>',' <text_end> ')
-	line = line.replace('<TEXT>','')
+	line = line.replace('</TEXT>','')
+	line = line.replace('<TEXT>','<text_start>')
 	
 	line = line.replace('&APOS;',' <apos> ')
 		
