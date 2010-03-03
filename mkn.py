@@ -30,7 +30,9 @@ class Model:
 			self.lexicon_set[n+1] = self.__ngramCount(training,n+1)
 		print "\tDone"
 
-		self.histoCount = self.lexicon_set[order-1]	
+		self.histoCount = {}
+		if order > 1:
+			self.lexicon_set[order-1]	
 		self.ngCount = self.lexicon_set[order]		
 		self.lexicon = self.lexicon_set[1]			
 		self.n = len(self.lexicon)
@@ -47,15 +49,17 @@ class Model:
 		return propositions
 	
 	def check_proba(self,order,percentage):
-		rounds = len(self.lexicon_set[order-1].keys())*percentage
+		rounds = int(len(self.lexicon_set[order-1].keys())*percentage)
+		mean_prob = 0.0;
 		for r in range(rounds):
 			histo = random.choice(self.lexicon_set[order-1].keys())
-			print histo
+			#print histo
 			proba = 0.0
 			for word in self.lexicon.keys():
 				if word != () :
 					proba += self.probNG_KN(word[0],histo)
-			print proba
+			mean_prob += proba * 1.0/float(rounds)
+		return mean_prob
 
 	def probNG_KN(self,word,histo):
 
@@ -106,8 +110,7 @@ class Model:
 			return self.probNG_KN_cache[hw]
 
 		if hw in self.lexicon_set[order]: #self.lexicon_set[order][hw] > 0:
-			try:
-				prob = ((self.lexicon_set[order][hw] - dc(order))/float(self.lexicon_set[len(histo)][histo])) +	gamma(self,histo) * pback(self,word,histo)
+			prob = ((self.lexicon_set[order][hw] - dc(order))/float(self.lexicon_set[len(histo)][histo])) +	gamma(self,histo) * pback(self,word,histo)
 		elif histo in self.lexicon_set[len(histo)]:
 			prob = gamma(self,histo)  * pback(self,word,histo)
 		else:

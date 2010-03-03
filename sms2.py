@@ -103,18 +103,38 @@ def main():
 	#print traintokenlines
 	
 	#mod = mlaplace.Model(traintokenlines,3)
-	print "Token Counting ..."
-	mod = mkn.Model(traintokenlines,3)
-	print "Done"
-
-	print "Checking probabilities ..."
-	mod.check_proba(3,0.01)
-	print "Done"
+	for order in range(2,4):
+		print "-------------------------------------------------------"
+		print "ORDER:",order
+		print "Token Counting ..."
+		mod = mkn.Model(traintokenlines,order)
+		print "Done"
+		
+		if(order > 1):
+			print "Checking probabilities ..."
+			print mod.check_proba(order,0.01)
+			print "Done"
 	
-	print "Perplexity ..."
-	#print mod.perplexity(token.smartTokenizer(testfile))
-	print "Done"
-	#game =  mod.shannon_game(("BOTH","OF","MY"))
+		print "Perplexity ..."
+		print mod.perplexity(token.smartTokenizer(testfile))
+		print "Done"
+		
+		if(order > 1):
+			print "Shannon Game..."
+			message = ("I","LL","LET","BOTH","OF","MY")
+			test = message[-(order-1):]
+			game =  mod.shannon_game(test)
+			print "Done"
+			i = 0
+			for g in game:
+				if g[1] == 'PARENTS':
+					print i
+				else:
+					i += 1
+			print "PARENT FOUND AT POS:",i
+			print "TOP 10:"
+			print game[:10]
+
 	#i = 0
 	#print "-----------------------------------------"
 	#for g in game:

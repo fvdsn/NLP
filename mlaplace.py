@@ -29,7 +29,9 @@ class Model:
 			self.lexicon_set[n+1] = self.__ngramCount(training,n+1)
 		print "\tDone"
 
-		self.histoCount = self.lexicon_set[order-1]	
+		self.histoCount = {}
+		if order > 1:
+			self.lexicon_set[order-1]	
 		self.ngCount = self.lexicon_set[order]		
 		self.lexicon = self.lexicon_set[1]			
 		self.n = len(self.lexicon)
