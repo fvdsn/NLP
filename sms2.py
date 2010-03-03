@@ -112,7 +112,7 @@ def main():
 	print "Done"
 	
 	print "Perplexity ..."
-	print mod.perplexity(token.smartTokenizer(testfile))
+	#print mod.perplexity(token.smartTokenizer(testfile))
 	print "Done"
 	#game =  mod.shannon_game(("BOTH","OF","MY"))
 	#i = 0

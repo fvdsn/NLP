@@ -108,13 +108,6 @@ class Model:
 		if hw in self.lexicon_set[order]: #self.lexicon_set[order][hw] > 0:
 			try:
 				prob = ((self.lexicon_set[order][hw] - dc(order))/float(self.lexicon_set[len(histo)][histo])) +	gamma(self,histo) * pback(self,word,histo)
-			except KeyError:
-				print KeyError
-				print "hw",hw
-				print "histo",histo
-				print histo in self.lexicon_set[len(histo)]
-				exit()
-
 		elif histo in self.lexicon_set[len(histo)]:
 			prob = gamma(self,histo)  * pback(self,word,histo)
 		else:
@@ -123,6 +116,30 @@ class Model:
 		self.probNG_KN_cache[hw] = prob
 		
 		return prob
+
+	def probNG(self,word,histo):
+		''' 
+		Compute the conditional probability according to a laplacian model of s
+		ome word word given a history histo
+		'''
+		sentence = histo + (word,)
+		# Respective counts
+		cSentence = 0
+		cHisto = (self.order ==1)*self.trainLength
+		
+		
+		if histo	in self.histoCount: 
+			cHisto = self.histoCount[histo]
+		if sentence in self.ngCount: 
+			cSentence = self.ngCount[sentence]
+			
+		#print str(sentence) + " " + str(cSentence)
+		#print str(histo) + " " + str(cHisto)
+		#print "prob : " + str((cSentence+1)/(1.0 * cHisto + self.n) ) 
+		
+		#print self.n
+		
+		return (cSentence+1)/(1.0 * cHisto + self.n) 
 
 	def __ngramCount(self,tokenlines,order) :
 		start = ('<text_start>',)

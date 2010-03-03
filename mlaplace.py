@@ -5,6 +5,7 @@ Created on 26 fevr. 2010
 '''
 
 import math
+import random
 
 class Model:
 	'''
@@ -21,12 +22,17 @@ class Model:
 		self.order = order
 		self.training = training
 		
-		self.histoCount = {}
-		if order > 1:
-			self.histoCount = self.__ngramCount(training,order-1) # histo lexicon
-		self.ngCount = self.__ngramCount(training, order)	 # ngram lexicon
-		self.lexicon = self.__ngramCount(training, 1)		  # token lexicon  
-		self.n = len(self.lexicon)					   # token lexicin size
+		self.lexicon_set = {}
+		print "\tComputing lexicons..."
+		for n in range(order):
+			print "\t\tOrder :",n+1,"..."
+			self.lexicon_set[n+1] = self.__ngramCount(training,n+1)
+		print "\tDone"
+
+		self.histoCount = self.lexicon_set[order-1]	
+		self.ngCount = self.lexicon_set[order]		
+		self.lexicon = self.lexicon_set[1]			
+		self.n = len(self.lexicon)
 		self.trainLength = self.__length(training)
 		
 	def shannon_game(self,histo):
@@ -47,11 +53,12 @@ class Model:
 		rounds = len(self.lexicon_set[order-1].keys())*percentage
 		for r in range(rounds):
 			histo = random.choice(self.lexicon_set[order-1].keys())
+			print "ROUND ",r,"IN",rounds
 			print histo
 			proba = 0.0
 			for word in self.lexicon.keys():
 				if word != () :
-					proba += self.probNG_KN(word[0],histo)
+					proba += self.probNG(word[0],histo)
 			print proba
 		
 		
@@ -66,16 +73,16 @@ class Model:
 		cHisto = (self.order ==1)*self.trainLength
 		
 		
-		if histo	in self.histoCount.keys() : 
+		if histo	in self.histoCount: 
 			cHisto = self.histoCount[histo]
-		if sentence in self.ngCount.keys() : 
+		if sentence in self.ngCount: 
 			cSentence = self.ngCount[sentence]
 			
-		print str(sentence) + " " + str(cSentence)
-		print str(histo) + " " + str(cHisto)
-		print "prob : " + str((cSentence+1)/(1.0 * cHisto + self.n) ) 
+		#print str(sentence) + " " + str(cSentence)
+		#print str(histo) + " " + str(cHisto)
+		#print "prob : " + str((cSentence+1)/(1.0 * cHisto + self.n) ) 
 		
-		print self.n
+		#print self.n
 		
 		return (cSentence+1)/(1.0 * cHisto + self.n) 
 	
