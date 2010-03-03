@@ -42,6 +42,17 @@ class Model:
 
 		propositions.sort(reverse=True)
 		return propositions
+
+	def check_proba(self,order,percentage):
+		rounds = len(self.lexicon_set[order-1].keys())*percentage
+		for r in range(rounds):
+			histo = random.choice(self.lexicon_set[order-1].keys())
+			print histo
+			proba = 0.0
+			for word in self.lexicon.keys():
+				if word != () :
+					proba += self.probNG_KN(word[0],histo)
+			print proba
 		
 		
 	def probNG(self,word,histo):
@@ -75,8 +86,8 @@ class Model:
 		count = {}
 		for line in tokenlines:
 		
-			if order > 2 : 
-				for i in range(2,order):
+			if order > 1 : 
+				for i in range(1,order):
 					key = start*(order-i) + tuple(line[0:i])
 					if key in count:
 						count[key] += 1
