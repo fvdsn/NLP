@@ -1,0 +1,109 @@
+
+	\subsubsection{Kneser-Ney Backoff Smoothing}
+		Nous avons ensuite testé la méthode de smoothing KN,
+		le discounting parameter est estimé par absolute discounting.
+
+		On remarque que la perplexité est optimale pour un degré 2,
+		Et augmente légèrement à chaque ordre supérieur.
+
+		Le classement du shannon game reste inchangé pour les ordres
+		plus grands que 3.
+
+		
+		Ordre 2:
+		perp:  	85.4646824944
+		oov:  	0.154
+		place: 	62
+
+		0.14547104398721766 	<unk> 
+		0.079776179945478864 	FRIEND 
+		0.059418401878393243 	DEAR 
+		0.05430224529609172 	SIS 
+		0.033005172382376519 	WAY 
+		0.02485082556509249 	DAD 
+		0.02284996621105629 	HOUSE 
+		0.01878215579445576 	MUM 
+		0.016742742943778151 	HP 
+		0.012768562447592469 	MSG
+		
+		Ordre 3:
+		perp:  	 113.056073923
+		oov:  	0.502
+		place: 	68
+
+		0.26878097467205098 	<unk>
+		0.14456399372129464 	FRIEND 
+		0.01871989892748141 	DEAR
+		0.017108042480822577 	SIS
+		0.016698608750005898 	PROJ 
+		0.016070662858092812 	NUMBER 
+		0.016060945766584289 	ANS 
+		0.016058169454724713 	PAST 
+		0.016058169454724713 	CONTROL 
+		0.016056434259812478 	WAR
+
+
+		Ordre 4:
+		perp:  	128.70879022
+		oov:  	0.742
+		place:	68
+		0.34911747204085919 	<unk> 
+		0.30442564079629625 	FRIEND 
+		0.02431512795277576 	DEAR 
+		0.02222150042338349 	SIS 
+		0.02168969020413198 	PROJ 
+		0.020874056275314568 	NUMBER 
+		0.020861434822374365 	ANS 
+		0.020857828692962876 	PAST 
+		0.020857828692962876 	CONTROL 
+		0.020855574862080704 	WAR
+
+
+
+		Ordre 5:
+		perp:  	192.611617659	
+			oov:  	0.827
+			place: 	68
+		
+		0.22987158652896078 	<unk> 
+		0.20044486636793168 	FRIEND 
+		0.016009960791951119 	DEAR 
+		0.014631440607989129 	SIS 
+		0.014281277500663032 	PROJ 
+		0.013744234584569264 	NUMBER 
+		0.013735924162880241 	ANS 
+		0.013733549756683375 	PAST 
+		0.013733549756683375 	CONTROL 
+		0.013732065752810338 	WAR
+
+
+	
+	\subsubsection{Intérèt du systême}
+		Faisons l'hypothèse que la meilleure perplexité obtenue (85) soit 
+		représentative d'une utilisation dans des conditions réelles. Cela veut dire
+		qu'en moyenne l'utilisateur choisira parmis les 85 premiers mots prédits 
+		par le systême. Étant donné qu'il est impossible de proposer autant de mots
+		sur un écran de GSM, le systême se trompera la plupart du temps. 
+		
+		Si l'on examine les propositions, on voit que le systême fonctionne le mieux
+		sur les bouts de phrases toutes faites, les prépositions, etc. Or ces mots sont
+		généralement déjà courts, ou communément abbrégés en 'langage sms', 
+		ce qui diminue l'intéret du systeme. 
+
+		Cependant si on utilise ce systême pour prédire le mot entier avec les premières
+		lettres entrées par l'utilisateur, on voit que deux pressions de touches permettent 
+		d'explorer 81 choix, soit presque le pouvoir prédictif du systême.
+		
+		Celui-ci permettrait donc à l'utilisateur de ne devoir utiliser
+		que 2 pressions de bouton par mot, nette amélioration sur la longueur moyenne d'un
+		mot de GSM qui est de 3.41 lettres (calculée sur le training set, ponctuation non comptée).
+		
+		Un autre avantage est que le mot prédit peut avoir l'orthographe correcte du mot, par
+		exemple \verbatim{B4} sera prédit en \verbatim{BEFORE}, ce qui donne des sms plus agréables
+		à lire, et plus longs, ce qui permettra d'augmenter encore un peu le bénéfice que l'opérateur
+		réalise sur ses sms.
+
+
+
+
+		

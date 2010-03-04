@@ -38,7 +38,6 @@ class Model:
 		self.n = len(self.lexicon)
 		self.ntot = sum(self.lexicon.values())
 
-
 	def shannon_game(self,histo):
 		propositions = []
 		for word in self.lexicon.keys() : 
@@ -58,6 +57,7 @@ class Model:
 			for word in self.lexicon.keys():
 				if word != () :
 					proba += self.probNG_KN(word[0],histo)
+			print proba
 			mean_prob += proba * 1.0/float(rounds)
 		return mean_prob
 
@@ -120,29 +120,33 @@ class Model:
 		
 		return prob
 
-	def probNG(self,word,histo):
-		''' 
-		Compute the conditional probability according to a laplacian model of s
-		ome word word given a history histo
-		'''
-		sentence = histo + (word,)
-		# Respective counts
-		cSentence = 0
-		cHisto = (self.order ==1)*self.trainLength
-		
-		
-		if histo	in self.histoCount: 
-			cHisto = self.histoCount[histo]
-		if sentence in self.ngCount: 
-			cSentence = self.ngCount[sentence]
-			
-		#print str(sentence) + " " + str(cSentence)
-		#print str(histo) + " " + str(cHisto)
-		#print "prob : " + str((cSentence+1)/(1.0 * cHisto + self.n) ) 
-		
-		#print self.n
-		
-		return (cSentence+1)/(1.0 * cHisto + self.n) 
+	def probNG_Basic(self,word,histo):
+		hw = histo + (word,)
+		ch = 0.0
+		chw = 0.0
+		if hw in self.lexicon_set[len(hw)]:
+			chw = float(self.lexicon_set[len(hw)][hw])
+		if histo == ():
+			return chw / self.ntot
+		elif histo in self.lexicon_set[len(histo)]:
+			ch = float(self.lexicon_set[len(histo)][histo])
+		return (chw+1)/(ch + len(self.lexicon_set[1]))
+	
+	def probNG_Linear(self,word,histo):
+		hw = histo + (word,)
+		order = len(hw)
+		lambdas = self.getLambdas(order)
+		prob = 0.0
+		for i in range(order):
+			prob += self.probNG_Basic(word,histo[-i:])*lambdas[i]
+		return prob
+
+	def makeLambdas(self,order,sample):
+		print "yo"
+
+	def getLambdas(self,order):
+		v = [1.0/order]
+		return v * order
 
 	def __ngramCount(self,tokenlines,order) :
 		start = ('<text_start>',)
@@ -167,7 +171,6 @@ class Model:
 
 		return count    
 
-			
 	def probText(self,testlines):
 		''' 
 		Compute the log probability of a text (given as a list of lists of toke
